@@ -1,6 +1,7 @@
 import itertools
 
 words = [word.rstrip() for word in open('words.txt').readlines()]
+allWords = [word for word in words]
 
 chars = "".join(words)
 
@@ -12,6 +13,10 @@ for letter in set(chars):
 sortedFreq = [c[0] for c in sorted(freq, key=lambda x: x[1], reverse=True)]
 
 print("Starting word count: " + str(len(words)))
+print()
+
+print("Most common letters: ")
+print(sortedFreq)
 print()
 
 
@@ -28,28 +33,38 @@ def removeAllMatch(five):
 
 def findNextWord():
     global sortedFreq
+    toReturn = []
 
     five = sortedFreq[:5]
     sortedFreq = sortedFreq[5:]
-    print(five)
+
     testWords = list(
         map("".join, itertools.permutations("".join(five))))
 
     matchFound = False
     for w in testWords:
         if w in words:
-            print(w)
+            toReturn.append(w)
             matchFound = True
 
     if matchFound:
         removeAllMatch(five)
-        print(len(words))
-        print()
+        # print(len(words))
+        return(toReturn)
     else:
         return
 
 
-findNextWord()
-findNextWord()
-findNextWord()
-findNextWord()
+def evaluate(w):
+    scores = [0, 0, 0, 0, 0]
+    for word in allWords:
+        for i, char in enumerate(w):
+            if char == word[i]:
+                scores[i] += 1
+    return(sum(scores))
+
+
+bestWords = [(w, evaluate(w)) for w in findNextWord()]
+
+print("Best words to guess, sorted by best position:")
+print([c for c in sorted(bestWords, key=lambda x: x[1], reverse=True)])
