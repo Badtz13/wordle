@@ -1,6 +1,7 @@
 import itertools
 
-words = [word.rstrip() for word in open('words.txt').readlines()]
+words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
+everyWord = [word.rstrip() for word in open('validWords.txt').readlines()]
 allWords = [word for word in words]
 
 chars = "".join(words)
@@ -43,7 +44,7 @@ def findNextWord():
 
     matchFound = False
     for w in testWords:
-        if w in words:
+        if w in everyWord:
             toReturn.append(w)
             matchFound = True
 

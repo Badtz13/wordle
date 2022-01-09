@@ -1,5 +1,5 @@
 import sys
-words = [word.rstrip() for word in open('words.txt').readlines()]
+words = [word.rstrip() for word in open('validWords.txt').readlines()]
 
 if len(sys.argv) != 3:
     print("usage: python match.py <letters it has> <letters it doesnt>")
