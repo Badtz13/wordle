@@ -19,9 +19,9 @@ def showGrid():
             if color == 'b':
                 printString += "\033[1;37;40m" + r[0][i] + "\033[0m"
             elif color == 'g':
-                printString += "\033[1;37;42m" + r[0][i] + "\033[0m"
+                printString += "\033[1;32;40m" + r[0][i] + "\033[0m"
             elif color == 'y':
-                printString += "\033[1;37;43m" + r[0][i] + "\033[0m"
+                printString += "\033[1;33;40m" + r[0][i] + "\033[0m"
         if len(printString) > 0:
             print(printString)
     return
