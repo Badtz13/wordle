@@ -5,7 +5,12 @@ import sys
 
 validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
 
-answer, number = solution.solution()
+index = None
+
+if len(sys.argv) > 1:
+    index = int(sys.argv[1])
+
+answer, number = solution.solution(index)
 grid = [[" " for c in range(5)] for n in range(6)]
 guesses = 0
 
@@ -27,18 +32,21 @@ def showGrid():
     return
 
 
-def check(guess):
-    ans = list("".join([c for c in answer]))
+def check(answer, guess):
     output = ['b' for i in range(5)]
-    for pos, letter in enumerate(ans):
-        if ans[pos] == guess[pos]:
-            ans[pos] = '_'
+    for pos, letter in enumerate(answer):
+        # print(f"{letter}")
+        if answer[pos] == guess[pos]:
+            answer[pos] = '_'
             output[pos] = 'g'
+            # print(f"\tGreen!")
             continue
-        for gletter in guess:
+        for i, gletter in enumerate(guess):
+            # print(f"\t{gletter}")
             if letter == gletter:
-                ans[pos] = '_'
-                output[pos] = 'y'
+                # print(f"\tYellow!")
+                answer[i] = '_'
+                output[i] = 'y'
                 break
     return output
 
@@ -47,7 +55,7 @@ def guess(word):
     global grid
     global guesses
 
-    grid[guesses] = [list(word), list(check(word))]
+    grid[guesses] = [list(word), list(check(list(answer), word))]
 
     guesses += 1
 
@@ -61,7 +69,22 @@ def checkResult():
 
 
 def showScore():
+    global grid
+    print()
     print("Wordle " + str(number) + " " + str(guesses) + "/6")
+    print()
+    for row in grid:
+        rowString = []
+        for c in row[1]:
+            if c == 'g':
+                rowString.append('🟩')
+            elif c == 'y':
+                rowString.append('🟨')
+            elif c == 'b':
+                rowString.append('⬛')
+        if len(rowString) > 0:
+            print("".join(rowString))
+    print()
 
 
 class prompt(Cmd):
@@ -84,11 +107,11 @@ class prompt(Cmd):
                 print("You lose!")
                 print("The correct answer was: ")
                 print(answer)
-                sys.exit()
+                return True
             elif checkResult() == True:
                 print("You win!")
                 showScore()
-                sys.exit()
+                return True
 
 
 if __name__ == '__main__':

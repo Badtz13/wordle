@@ -1,5 +1,5 @@
 import sys
-words = [word.rstrip() for word in open('validWords.txt').readlines()]
+words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
 
 if len(sys.argv) != 3:
     print("usage: python match.py <letters it has> <letters it doesnt>")
@@ -37,8 +37,8 @@ freq = []
 for letter in set(chars):
     freq.append([letter, chars.count(letter)])
 
-sortedFreq = [c[0] for c in sorted(freq, key=lambda x: x[1], reverse=True)]
+sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
 
 print()
 print("Best letters to guess by frequency, excluding letters you already have:")
-print([c for c in sortedFreq if c not in has])
+print([c for c in sortedFreq if c[0] not in has])

@@ -18,7 +18,7 @@ def generateMaskPerms(guessList, answerList):
             maskDict[guess][mask] += 1
     with open('maskDict.json', 'w') as maskFile:
         maskFile.write(json.dumps(maskDict))
-        
+
 
 def modifyWordList(wordlist, mask, guess):
     modifiedWordList = wordlist
@@ -52,6 +52,11 @@ def bestWord(maskDict, answerList):
     return bestWord
 
 
+# answer = "__ery"
+# guess = "quote"
+# output = "ggbbb"
+
+
 def check(answer, guess):
     output = ['b' for i in range(5)]
     for pos, letter in enumerate(answer):
@@ -61,18 +66,19 @@ def check(answer, guess):
             output[pos] = 'g'
             # print(f"\tGreen!")
             continue
-        for gletter in guess:
+        for i, gletter in enumerate(guess):
             # print(f"\t{gletter}")
             if letter == gletter:
                 # print(f"\tYellow!")
-                answer[pos] = '_'
-                output[pos] = 'y'
+                answer[i] = '_'
+                output[i] = 'y'
                 break
     return "".join(output)
 
 
-# print(check(list("truss"), "ssurt"))
-generateMaskPerms(everyWord, words)
-with open('maskDict.json', 'r') as maskFile:
-    maskDict = json.load(maskFile)
-    bestWord(maskDict, words)
+print(check(list("query"), "quote"))
+# # print(check(list("truss"), "ssurt"))
+# generateMaskPerms(everyWord, words)
+# with open('maskDict.json', 'r') as maskFile:
+#     maskDict = json.load(maskFile)
+#     bestWord(maskDict, words)
