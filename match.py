@@ -13,11 +13,14 @@ else:
 
 
 def score(word):
+    global sortedFreq
     score = 0
+    used = []
     for char in word:
         for letter in sortedFreq:
-            if char == letter[0]:
+            if char == letter[0] and char not in used:
                 score += letter[1]
+                used.append(char)
     return score
 
 
@@ -25,15 +28,23 @@ green = []
 
 for row in data:
     for i, char, color in zip(range(5), row[0], row[1]):
-        # print(str(i) + " " + char + " " + color)
-        if color == 'b':
-            words = [word for word in words if char not in word or char in green]
-        elif color == 'g':
+        print(str(i) + " " + char + " " + color)
+        if color == 'g':
             words = [word for word in words if word[i] == char]
             green.append(char)
         elif color == 'y':
             words = [word for word in words if word[i]
                      != char and char in word]
+            green.append(char)
+        print(words)
+
+for row in data:
+    for i, char, color in zip(range(5), row[0], row[1]):
+        print(str(i) + " " + char + " " + color)
+        if color == 'b':
+            words = [
+                word for word in words if char not in word or char in green]
+        print(words)
 
 chars = "".join(words)
 

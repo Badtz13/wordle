@@ -23,7 +23,7 @@ def check(answer, guessStr):
             if letter == gletter:
                 # print(f"\tYellow!")
                 answer[pos] = ' '
-                guess[i] = '_'
+                # guess[i] = '_'
                 output[i] = 'y'
                 break
     return output
