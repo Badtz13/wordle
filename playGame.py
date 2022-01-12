@@ -13,6 +13,11 @@ guesses = 0
 
 sortedFreq = []
 
+target = None
+
+if len(sys.argv) == 2:
+    target = sys.argv[1]
+
 
 def reset(index=None):
     global words
@@ -107,7 +112,9 @@ def genData(w):
 def playGame(i, ans):
     global lost
     reset(i)
+    guessList = []
     genData("arose")
+    guessList.append("arose")
     if checkResult() == True:
         return [ans, guesses]
     while True:
@@ -115,6 +122,7 @@ def playGame(i, ans):
         if len(pos) == 0:
             break
         genData(pos)
+        guessList.append(pos)
         if guesses == 6:
             # print("Lost: " + ans + ", Number: " + str(i))
             lost.append([ans, i])
@@ -122,7 +130,7 @@ def playGame(i, ans):
         if checkResult() == True:
             # print("Won at: " + str(guesses))
             # print("The word was: " + ans)
-            return [ans, guesses]
+            return [ans, guesses, guessList]
 
 
 lost = []
@@ -134,17 +142,33 @@ for i in tqdm(range(0, len(allWords))):
     if res:
         games.append(res)
 
-
 games = [g for g in sorted(games, key=lambda x: x[1], reverse=False)]
-print()
-print("Won: " + str(len(games)) + "/" + str(len(allWords)) + " games")
-print()
-print("Guesses: ")
 
-for i in range(1, 6):
-    print(" " + str(i) + " :  ", end="")
-    print(len([g for g in games if g[1] == i]))
+if target == None:
+    print()
+    print("Won: " + str(len(games)) + "/" + str(len(allWords)) + " games")
+    print()
+    print("Guesses: ")
 
-print(">6 :  " + str(len(lost)))
-print()
-print([l[0] for l in lost])
+    for i in range(1, 6):
+        print(" " + str(i) + " :  ", end="")
+        print(len([g for g in games if g[1] == i]))
+
+    print(">6 :  " + str(len(lost)))
+    print()
+
+# print([l[0] for l in lost])
+if target != None:
+    if len([g for g in lost if g[0] == target]) == 0:
+        path = [g for g in games if g[0] == target][0]
+        print()
+        print("Guesses to make to reach 『 " + target + " 』: " + str(path[1]))
+        print()
+        print("Steps: ")
+        for s in path[2]:
+            print(s)
+        print()
+    else:
+        print()
+        print("Sorry, 『 " + target + " 』is currently not solvable ")
+        print()

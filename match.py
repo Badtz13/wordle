@@ -28,7 +28,6 @@ green = []
 
 for row in data:
     for i, char, color in zip(range(5), row[0], row[1]):
-        print(str(i) + " " + char + " " + color)
         if color == 'g':
             words = [word for word in words if word[i] == char]
             green.append(char)
@@ -36,15 +35,12 @@ for row in data:
             words = [word for word in words if word[i]
                      != char and char in word]
             green.append(char)
-        print(words)
 
 for row in data:
     for i, char, color in zip(range(5), row[0], row[1]):
-        print(str(i) + " " + char + " " + color)
         if color == 'b':
             words = [
                 word for word in words if char not in word or char in green]
-        print(words)
 
 chars = "".join(words)
 
@@ -55,13 +51,14 @@ for letter in set(chars):
 
 sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
 
-print()
-print("Best letters to guess by frequency: ")
-print(sortedFreq)
+# print()
+# print("Best letters to guess by frequency: ")
+# print(sortedFreq)
 
 
 words = sorted(words, key=score, reverse=True)
 
 print()
-print("Best words to guess by frequency, excluding impossible words: ")
+print("Possible words, sorted by character frequency: ")
 print(words)
+print()
