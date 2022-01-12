@@ -1,36 +1,41 @@
 import sys
 words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
 
-if len(sys.argv) != 3:
-    print("usage: python match.py <letters it has> <letters it doesnt>")
+data = []
+
+args = sys.argv[1:]
+if len(args) < 2:
+    print("usage: python match.py <word guessed> <colors>, <word guessed> <colors>, ...")
     sys.exit()
 else:
-    has = list(sys.argv[1])
-    doesnt = list(sys.argv[2])
+    for i in range(0, len(args), 2):
+        data.append([args[i], args[i+1]])
 
 
-def keep(w):
-    for char in doesnt:
-        if char in w:
-            return False
-    return True
+def score(word):
+    score = 0
+    for char in word:
+        for letter in sortedFreq:
+            if char == letter[0]:
+                score += letter[1]
+    return score
 
 
-words = [word for word in words if keep(word)]
+green = []
 
-possible = []
-for word in words:
-    should = len(has)
-    for c in has:
-        if c in word:
-            should -= 1
-    if should < 1:
-        possible.append(word)
+for row in data:
+    for i, char, color in zip(range(5), row[0], row[1]):
+        # print(str(i) + " " + char + " " + color)
+        if color == 'b':
+            words = [word for word in words if char not in word or char in green]
+        elif color == 'g':
+            words = [word for word in words if word[i] == char]
+            green.append(char)
+        elif color == 'y':
+            words = [word for word in words if word[i]
+                     != char and char in word]
 
-print("Possible words are:")
-print(possible)
-
-chars = "".join(possible)
+chars = "".join(words)
 
 freq = []
 
@@ -40,5 +45,12 @@ for letter in set(chars):
 sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
 
 print()
-print("Best letters to guess by frequency, excluding letters you already have:")
-print([c for c in sortedFreq if c[0] not in has])
+print("Best letters to guess by frequency: ")
+print(sortedFreq)
+
+
+words = sorted(words, key=score, reverse=True)
+
+print()
+print("Best words to guess by frequency, excluding impossible words: ")
+print(words)

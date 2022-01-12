@@ -1,5 +1,5 @@
 from cmd import Cmd
-import solution
+import wordle
 import os
 import sys
 
@@ -10,7 +10,7 @@ index = None
 if len(sys.argv) > 1:
     index = int(sys.argv[1])
 
-answer, number = solution.solution(index)
+answer, number = wordle.solution(index)
 grid = [[" " for c in range(5)] for n in range(6)]
 guesses = 0
 
@@ -32,30 +32,11 @@ def showGrid():
     return
 
 
-def check(answer, guess):
-    output = ['b' for i in range(5)]
-    for pos, letter in enumerate(answer):
-        # print(f"{letter}")
-        if answer[pos] == guess[pos]:
-            answer[pos] = '_'
-            output[pos] = 'g'
-            # print(f"\tGreen!")
-            continue
-        for i, gletter in enumerate(guess):
-            # print(f"\t{gletter}")
-            if letter == gletter:
-                # print(f"\tYellow!")
-                answer[i] = '_'
-                output[i] = 'y'
-                break
-    return output
-
-
 def guess(word):
     global grid
     global guesses
 
-    grid[guesses] = [list(word), list(check(list(answer), word))]
+    grid[guesses] = [list(word), list(wordle.check(list(answer), word))]
 
     guesses += 1
 
@@ -115,5 +96,6 @@ class prompt(Cmd):
 
 
 if __name__ == '__main__':
+    # print(check(list("abbey"), "ables"))
     showGrid()
     prompt().cmdloop()
