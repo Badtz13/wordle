@@ -1,5 +1,6 @@
 import sys
 words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
+allWords = [word.rstrip() for word in open('validWords.txt').readlines()]
 
 data = []
 
@@ -50,10 +51,20 @@ for letter in set(chars):
     freq.append([letter, chars.count(letter)])
 
 sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
+sortedFreq = [c for c in sortedFreq if c[0] not in green]
 
-# print()
-# print("Best letters to guess by frequency: ")
-# print(sortedFreq)
+if len(sortedFreq) != 0:
+    print()
+    print("Best letters to guess by frequency: ")
+    print(sortedFreq)
+    print()
+
+    wordScores = []
+    for word in allWords:
+        wordScores.append([word, score(word)])
+
+    print("Best words to guess to reduce remaining solutions: ")
+    print([w for w in sorted(wordScores, key=lambda x: x[1], reverse=True)][:10])
 
 
 words = sorted(words, key=score, reverse=True)

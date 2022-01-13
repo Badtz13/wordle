@@ -3,6 +3,7 @@ import wordle
 from tqdm import tqdm
 
 words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
+everyWord = [word.rstrip() for word in open('validWords.txt').readlines()]
 allWords = [word for word in words]
 data = []
 
@@ -38,7 +39,7 @@ def reset(index=None):
 def guess(word):
     global grid
     global guesses
-
+    # print("Guessing: " + word)
     grid[guesses] = [list(word), list(wordle.check(list(answer), word))]
     guesses += 1
 
@@ -51,12 +52,14 @@ def checkResult():
     return False
 
 
-def score(word):
+def score(word, freqList=None):
     global sortedFreq
+    if freqList == None:
+        freqList = sortedFreq
     score = 0
     used = []
     for char in word:
-        for letter in sortedFreq:
+        for letter in freqList:
             if char == letter[0] and char not in used:
                 score += letter[1]
                 used.append(char)
@@ -94,13 +97,21 @@ def genPossible():
         freq.append([letter, chars.count(letter)])
 
     sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
+    some = sorted(words, key=score, reverse=True)
+    choppedFreq = [c for c in sortedFreq if c[0] not in green]
 
-    words = sorted(words, key=score, reverse=True)
+    wordScores = []
+    for word in everyWord:
+        wordScores.append([word, score(word, choppedFreq)])
+
+    words = [w[0] for w in sorted(
+        wordScores, key=lambda x: x[1], reverse=True)]
+
     if len(words) == 0:
         print(number)
         print(answer)
         return []
-    return words[0]
+    return words, some
 
 
 def genData(w):
@@ -118,11 +129,15 @@ def playGame(i, ans):
     if checkResult() == True:
         return [ans, guesses]
     while True:
-        pos = genPossible()
-        if len(pos) == 0:
-            break
+        full, some = genPossible()
+        print(full)
+        if len(some) == 1:
+            pos = some[0]
+        else:
+            pos = full[0]
         genData(pos)
         guessList.append(pos)
+
         if guesses == 6:
             # print("Lost: " + ans + ", Number: " + str(i))
             lost.append([ans, i])
@@ -137,10 +152,11 @@ lost = []
 games = []
 
 print()
-for i in tqdm(range(0, len(allWords))):
-    res = playGame(i, allWords[i])
-    if res:
-        games.append(res)
+# for i in tqdm(range(0, len(allWords))):
+i = 7
+res = playGame(i, allWords[i])
+if res:
+    games.append(res)
 
 games = [g for g in sorted(games, key=lambda x: x[1], reverse=False)]
 
@@ -157,7 +173,8 @@ if target == None:
     print(">6 :  " + str(len(lost)))
     print()
 
-# print([l[0] for l in lost])
+print([l for l in lost])
+
 if target != None:
     if len([g for g in lost if g[0] == target]) == 0:
         path = [g for g in games if g[0] == target][0]
