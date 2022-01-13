@@ -23,10 +23,9 @@ def genData(w, answer):
     return[w, "".join(wordle.check(list(answer), w))]
 
 
-def playGame(gameNumber, vw, va):
+def playGame(answer, vw, va):
 
     data = []
-    answer, _ = wordle.solution(gameNumber)
     grid = [[" " for c in range(5)] for n in range(6)]
     guesses = 0
     sortedFreq = []
@@ -58,7 +57,7 @@ def playGame(gameNumber, vw, va):
 
 games = []
 for i in tqdm(range(len(validAnswers))):
-    games.append([playGame(i, validAnswers, validWords), i])
+    games.append([playGame(validAnswers[i], validAnswers, validWords), i])
 
 games = [g for g in sorted(games, key=lambda x: x[0][2], reverse=False)]
 
@@ -68,7 +67,8 @@ print(
 
 lost = [g for g in games if g[0][0] == False]
 print("Lost: " + str(len(lost)))
-print([[l[0][1], l[1]] for l in lost])
+if len(lost) > 0:
+    print([[l[0][1], l[1]] for l in lost])
 
 print()
 print("Guesses: ")
