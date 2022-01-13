@@ -84,3 +84,21 @@ def genPossible(data, validWords, validAnswers):
     some = sorted(words, key=lambda x: score(x[1], sortedFreq), reverse=True)
 
     return [w for w in full if w not in guessList], [w for w in some if w not in guessList]
+
+
+def showScore(grid, number, guesses):
+    print()
+    print("Wordle " + str(number) + " " + str(guesses) + "/6")
+    print()
+    for row in grid:
+        rowString = []
+        for c in row[1]:
+            if c == 'g':
+                rowString.append('🟩')
+            elif c == 'y':
+                rowString.append('🟨')
+            elif c == 'b':
+                rowString.append('⬛')
+        if len(rowString) > 0:
+            print("".join(rowString))
+    print()

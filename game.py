@@ -49,25 +49,6 @@ def checkResult():
     return False
 
 
-def showScore():
-    global grid
-    print()
-    print("Wordle " + str(number) + " " + str(guesses) + "/6")
-    print()
-    for row in grid:
-        rowString = []
-        for c in row[1]:
-            if c == 'g':
-                rowString.append('🟩')
-            elif c == 'y':
-                rowString.append('🟨')
-            elif c == 'b':
-                rowString.append('⬛')
-        if len(rowString) > 0:
-            print("".join(rowString))
-    print()
-
-
 class prompt(Cmd):
     prompt = ''
 
@@ -91,7 +72,7 @@ class prompt(Cmd):
                 return True
             elif checkResult() == True:
                 print("You win!")
-                showScore()
+                wordle.showScore(grid, number, guesses)
                 return True
 
 

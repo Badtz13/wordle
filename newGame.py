@@ -62,11 +62,11 @@ def playGame(answer, vw, va):
 
         # check if we won
         if checkResult(grid, guesses):
-            return [True, answer, guesses, guessList]
+            return [True, answer, guesses, guessList, grid]
 
         # make sure we didn't lose before looping
         if guesses == 6:
-            return [False, answer, guesses, guessList]
+            return [False, answer, guesses, guessList, grid]
 
 
 if len(sys.argv) == 1:
@@ -101,10 +101,12 @@ if len(sys.argv) == 1:
 
 elif len(sys.argv) == 2:
     if sys.argv[1] == "today":
-        word, _ = wordle.solution()
+        word, number = wordle.solution()
         result = playGame(word, validAnswers, validWords)
     else:
+        number = int(sys.argv[1])
         result = playGame(
-            validAnswers[int(sys.argv[1])], validAnswers, validWords)
+            validAnswers[number], validAnswers, validWords)
     print("Wins in " + str(result[2]) + " guesses: ")
     print(result[3])
+    wordle.showScore(result[4], number, result[2])
