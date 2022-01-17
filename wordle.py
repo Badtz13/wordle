@@ -102,3 +102,12 @@ def showScore(grid, number, guesses):
         if len(rowString) > 0:
             print("".join(rowString))
     print()
+
+
+def bestFirstWord():
+    doneScores = [w.rstrip().split(",")
+                  for w in open('doneGames.txt').readlines()]
+    doneScores = [d for d in doneScores if d[1] != "10"]
+    doneScores = [g for g in sorted(
+        doneScores, key=lambda x: x[1], reverse=False)]
+    return(doneScores[0][0])
