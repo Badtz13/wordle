@@ -99,10 +99,14 @@ elif len(sys.argv) > 1:
         print(result[3])
         wordle.showScore(result[4], number, result[2])
     elif command == "all":
+        startWord = wordle.bestFirstWord()
+        if len(sys.argv) == 3:
+            startWord = sys.argv[2]
+
         games = []
         for i in tqdm(range(len(validAnswers))):
             games.append(
-                [playGame(validAnswers[i], validAnswers, validWords), i])
+                [playGame(validAnswers[i], validAnswers, validWords, startWord), i])
 
         games = [g for g in sorted(
             games, key=lambda x: x[0][2], reverse=False)]
