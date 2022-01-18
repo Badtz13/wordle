@@ -2,190 +2,200 @@ import sys
 import wordle
 from tqdm import tqdm
 
-words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
-everyWord = [word.rstrip() for word in open('validWords.txt').readlines()]
-allWords = [word for word in words]
-data = []
-
-index = None
-answer, number = wordle.solution(index)
-grid = [[" " for c in range(5)] for n in range(6)]
-guesses = 0
-
-sortedFreq = []
-
-target = None
-
-if len(sys.argv) == 2:
-    target = sys.argv[1]
+# read in lists
+validAnswers = [word.rstrip()
+                for word in open('validAnswers.txt').readlines()]
+validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
 
 
-def reset(index=None):
-    global words
-    global data
-    global grid
-    global guesses
-    global sortedFreq
-    global answer
-    global number
-    words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
-    data = []
-    answer, number = wordle.solution(index)
-    grid = [[" " for c in range(5)] for n in range(6)]
-    guesses = 0
-    sortedFreq = []
-
-
-def guess(word):
-    global grid
-    global guesses
-    # print("Guessing: " + word)
+def guess(word, answer, grid, guesses, guessList):
+    # guesses a word and returns the new grid and guess count
     grid[guesses] = [list(word), list(wordle.check(list(answer), word))]
+    guessList.append(word)
     guesses += 1
+    return grid, guesses, guessList
 
 
-def checkResult():
-    global grid
-    for row in grid:
-        if "".join(row[1]) == "ggggg":
-            return True
+def checkResult(grid, guesses):
+    # checks if the most recent guess won the game
+    if "".join(grid[guesses-1][1]) == "ggggg":
+        return True
     return False
 
 
-def score(word, freqList=None):
-    global sortedFreq
-    if freqList == None:
-        freqList = sortedFreq
-    score = 0
-    used = []
-    for char in word:
-        for letter in freqList:
-            if char == letter[0] and char not in used:
-                score += letter[1]
-                used.append(char)
-    return score
+def playGame(answer, vw, va, firstGuess=wordle.bestFirstWord()):
+    # plays the game, given the answer and wordlists
 
-
-def genPossible():
-    global data
-    global words
-    global sortedFreq
-    global number
-    global answer
-    green = []
-    for row in data:
-        for i, char, color in zip(range(5), row[0], row[1]):
-            # print(str(i) + " " + char + " " + color)
-            if color == 'g':
-                words = [word for word in words if word[i] == char]
-                green.append(char)
-            elif color == 'y':
-                words = [word for word in words if word[i]
-                         != char and char in word]
-                green.append(char)
-    for row in data:
-        for i, char, color in zip(range(5), row[0], row[1]):
-            # print(str(i) + " " + char + " " + color)
-            if color == 'b':
-                words = [
-                    word for word in words if char not in word or char in green]
-    chars = "".join(words)
-
-    freq = []
-
-    for letter in set(chars):
-        freq.append([letter, chars.count(letter)])
-
-    sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
-    some = sorted(words, key=score, reverse=True)
-    choppedFreq = [c for c in sortedFreq if c[0] not in green]
-
-    wordScores = []
-    for word in everyWord:
-        wordScores.append([word, score(word, choppedFreq)])
-
-    words = [w[0] for w in sorted(
-        wordScores, key=lambda x: x[1], reverse=True)]
-
-    if len(words) == 0:
-        print(number)
-        print(answer)
-        return []
-    return words, some
-
-
-def genData(w):
-    global data
-    guess(w)
-    data.append([w, "".join(wordle.check(list(answer), w))])
-
-
-def playGame(i, ans):
-    global lost
-    reset(i)
+    # reset variables
+    data = []
+    grid = [[" " for c in range(5)] for n in range(6)]
+    guesses = 0
     guessList = []
-    genData("arose")
-    guessList.append("arose")
-    if checkResult() == True:
-        return [ans, guesses]
+    sortedFreq = []
+
+    # guess the first guess
+    grid, guesses, guessList = guess(
+        firstGuess, answer, grid, guesses, guessList)
+    data.append([firstGuess, "".join(wordle.check(list(answer), firstGuess))])
+
+    # make sure it didnt win instantly
+    if checkResult(grid, guesses):
+        return [True, answer, guesses]
+
+    # basic game loop
     while True:
-        full, some = genPossible()
-        print(full)
-        if len(some) == 1:
-            pos = some[0]
+
+        # find possible words
+        full, some = wordle.genPossible(data, validAnswers, validWords)
+
+        # if there is only one possible answer, select it
+        if len(some) == 1 or len(full) == 0:
+            selected = some[0]
         else:
-            pos = full[0]
-        genData(pos)
-        guessList.append(pos)
+            selected = full[0]
 
+        # guess the selected word
+        grid, guesses, guessList = guess(
+            selected, answer, grid, guesses, guessList)
+        data.append([selected, "".join(wordle.check(list(answer), selected))])
+
+        # check if we won
+        if checkResult(grid, guesses):
+            return [True, answer, guesses, guessList, grid]
+
+        # make sure we didn't lose before looping
         if guesses == 6:
-            # print("Lost: " + ans + ", Number: " + str(i))
-            lost.append([ans, i])
-            break
-        if checkResult() == True:
-            # print("Won at: " + str(guesses))
-            # print("The word was: " + ans)
-            return [ans, guesses, guessList]
+            return [False, answer, guesses, guessList, grid]
 
 
-lost = []
-games = []
+def showUsage():
+    print("Usage:")
+    print("newGame.py all")
+    print("newGame.py single <today/gameNumber>")
+    print("newGame.py findBest <divisor> <segment>")
 
-print()
-# for i in tqdm(range(0, len(allWords))):
-i = 7
-res = playGame(i, allWords[i])
-if res:
-    games.append(res)
 
-games = [g for g in sorted(games, key=lambda x: x[1], reverse=False)]
+# no args, show help
+if len(sys.argv) == 1:
+    showUsage()
 
-if target == None:
-    print()
-    print("Won: " + str(len(games)) + "/" + str(len(allWords)) + " games")
-    print()
-    print("Guesses: ")
+# if multiple args
+elif len(sys.argv) > 1:
+    command = sys.argv[1]
 
-    for i in range(1, 6):
-        print(" " + str(i) + " :  ", end="")
-        print(len([g for g in games if g[1] == i]))
+    # play single game
+    if command == "single":
 
-    print(">6 :  " + str(len(lost)))
-    print()
+        # check if game number is specified
+        if len(sys.argv) > 2:
+            word, number = wordle.solution(int(sys.argv[2]))
 
-print([l for l in lost])
+        # assume today
+        else:
+            word, number = wordle.solution()
 
-if target != None:
-    if len([g for g in lost if g[0] == target]) == 0:
-        path = [g for g in games if g[0] == target][0]
+        result = playGame(word, validAnswers, validWords)
+        print("Wins in " + str(result[2]) + " guesses: ")
+        print(result[3])
+        wordle.showScore(result[4], number, result[2])
+    elif command == "all":
+        startWord = wordle.bestFirstWord()
+        if len(sys.argv) == 3:
+            startWord = sys.argv[2]
+
+        games = []
+        for i in tqdm(range(len(validAnswers))):
+            games.append(
+                [playGame(validAnswers[i], validAnswers, validWords, startWord), i])
+
+        games = [g for g in sorted(
+            games, key=lambda x: x[0][2], reverse=False)]
+
+        # show results
         print()
-        print("Guesses to make to reach 『 " + target + " 』: " + str(path[1]))
+        print(
+            "Won: " + str(len([g for g in games if g[0][0] == True])) + "/" + str(len(games)))
+
+        lost = [g for g in games if g[0][0] == False]
+        print("Lost: " + str(len(lost)))
+
+        # show names of lost games, if any
+        if len(lost) > 0:
+            print([[l[0][1], l[1]] for l in lost])
+
+        # guess count output
         print()
-        print("Steps: ")
-        for s in path[2]:
-            print(s)
+        print("Guesses: ")
+        for i in range(1, 7):
+            print(" " + str(i) + " :  ", end="")
+            print(len([g for g in games if g[0][2] == i]))
+
+        print(">6 :  " + str(len(lost)))
         print()
-    else:
-        print()
-        print("Sorry, 『 " + target + " 』is currently not solvable ")
-        print()
+    elif command == "findBest":
+
+        # check for list size?
+        if len(sys.argv) == 4:
+            segment = int(sys.argv[3])
+            segSize = len(validWords) // int(sys.argv[2])
+
+            validWords = [validWords[i]
+                          for i in range(segment*segSize, segSize*(segment+1))]
+
+            print("Checking all possible starting words: ")
+            doneScores = [w.rstrip().split(",")
+                          for w in open('doneGames.txt').readlines()]
+            doneWords = [w[0] for w in doneScores]
+            doneFile = open("doneGames.txt", "a")
+            if len(doneWords) > 0:
+                print(str(len(doneWords)) +
+                      " completed words found, removing from segment and resuming... ")
+
+            validWords = [c for c in validWords if c not in doneWords]
+
+            print(str(len(validWords)) +
+                  " words left to try in the specified segment ")
+
+            if(len(validWords) == 0):
+                print("This segment is already completed!")
+                sys.exit()
+
+            allGames = []
+            for w in tqdm(validWords):
+                shouldBreak = False
+                # play games and show progress bar
+                games = []
+                for i in tqdm(range(len(validAnswers))):
+                    tempRes = [
+                        playGame(validAnswers[i], validAnswers, validWords, w), i]
+                    if tempRes[0] == False:
+                        shouldBreak = True
+                        break
+                    games.append(tempRes)
+                if shouldBreak:
+                    doneFile.write(w + ",10\n")
+                    continue
+                games = [g for g in sorted(
+                    games, key=lambda x: x[0][2], reverse=False)]
+
+                lost = [g for g in games if g[0][0] == False]
+                if len(lost) > 0:
+                    allGames.append([False, w])
+                    doneFile.write(w + ",10\n")
+                    continue
+                else:
+                    points = []
+                    # print(games[0])
+                    for i in range(1, 7):
+                        points += [g[0][2] for g in games if g[0][2] == i]
+                    allGames.append(
+                        [True, w, round(sum(points)/len(points), 3)])
+                    doneFile.write(
+                        w + "," + str(round(sum(points)/len(points), 3)) + "\n")
+            allGames = [g for g in allGames if g[0] == True]
+            allGames = [[g[1], g[2]] for g in allGames]
+            allGames += doneScores
+            allGames = [g for g in sorted(
+                allGames, key=lambda x: float(x[1]), reverse=False)]
+
+            print(allGames[:3])
