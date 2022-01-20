@@ -49,7 +49,7 @@ def playGame(answer, vw, va, firstGuess=wordle.bestFirstWord()):
         full, some = wordle.genPossible(data, validAnswers, validWords)
 
         # if there is only one possible answer, select it
-        if len(some) == 1 or len(full) == 0:
+        if len(some) < 3 or len(full) == 0:
             selected = some[0]
         else:
             selected = full[0]
