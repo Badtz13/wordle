@@ -1,6 +1,8 @@
-from tqdm import tqdm
 import json
 import math
+
+from tqdm import tqdm
+
 words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
 everyWord = [word.rstrip() for word in open('validWords.txt').readlines()]
 

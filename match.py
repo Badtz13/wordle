@@ -1,5 +1,6 @@
-import wordle
 import sys
+
+import wordle
 
 validAnswers = [word.rstrip() for word in open('validAnswers.txt').readlines()]
 validWords = [word.rstrip() for word in open('validWords.txt').readlines()]

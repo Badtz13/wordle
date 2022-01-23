@@ -1,7 +1,8 @@
-from cmd import Cmd
-import wordle
 import os
 import sys
+from cmd import Cmd
+
+import wordle
 
 validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
 

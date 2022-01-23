@@ -1,4 +1,5 @@
 from datetime import date
+
 words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
 
 
@@ -42,8 +43,9 @@ def score(word, freqList):
 
 def genPossible(data, validWords, validAnswers):
     green = []
-    words = [word for word in validWords]
+    black = []
     guessList = [g[0] for g in data]
+    words = [word for word in validWords if word not in guessList]
 
     for row in data:
         for i, char, color in zip(range(5), row[0], row[1]):
@@ -54,12 +56,11 @@ def genPossible(data, validWords, validAnswers):
                 words = [word for word in words if word[i]
                          != char and char in word]
                 green.append(char)
+            else:
+                black.append(char)
 
-    for row in data:
-        for i, char, color in zip(range(5), row[0], row[1]):
-            if color == 'b':
-                words = [
-                    word for word in words if char not in word or char in green]
+    for char in [b for b in black if b not in green]:
+        words = [word for word in words if char not in word]
 
     chars = "".join(words)
 
@@ -68,22 +69,19 @@ def genPossible(data, validWords, validAnswers):
     for letter in set(chars):
         freq.append([letter, chars.count(letter)])
 
-    sortedFreq = [c for c in sorted(freq, key=lambda x: x[1], reverse=True)]
-    sortedFreq = [c for c in sortedFreq if c[0] not in green]
+    sortedFreq = [c for c in sorted(
+        freq, key=lambda x: x[1], reverse=True) if c[0] not in green]
+
     if len(sortedFreq) != 0:
 
-        wordScores = []
-        for word in validWords:
-            wordScores.append([word, score(word, sortedFreq)])
-
-        full = [w[0] for w in sorted(
-            wordScores, key=lambda x: x[1], reverse=True)]
+        full = [w[0] for w in sorted([[word, score(word, sortedFreq)]
+                                     for word in validWords], key=lambda x: x[1], reverse=True)]
     else:
         full = []
 
     some = sorted(words, key=lambda x: score(x[1], sortedFreq), reverse=True)
 
-    return [w for w in full if w not in guessList], [w for w in some if w not in guessList]
+    return full, some
 
 
 def showScore(grid, number, guesses):

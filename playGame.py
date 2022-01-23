@@ -1,6 +1,8 @@
 import sys
-import wordle
+
 from tqdm import tqdm
+
+import wordle
 
 # read in lists
 validAnswers = [word.rstrip()
