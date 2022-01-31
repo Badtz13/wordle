@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 
 from tqdm import tqdm
@@ -177,23 +178,16 @@ elif len(sys.argv) > 1:
                 if shouldBreak:
                     doneFile.write(w + ",10\n")
                     continue
-                games = [g for g in sorted(
-                    games, key=lambda x: x[0][2], reverse=False)]
 
-                lost = [g for g in games if g[0][0] == False]
-                if len(lost) > 0:
-                    allGames.append([False, w])
-                    doneFile.write(w + ",10\n")
-                    continue
-                else:
-                    points = []
-                    # print(games[0])
-                    for i in range(1, 7):
-                        points += [g[0][2] for g in games if g[0][2] == i]
-                    allGames.append(
-                        [True, w, round(sum(points)/len(points), 3)])
-                    doneFile.write(
-                        w + "," + str(round(sum(points)/len(points), 3)) + "\n")
+                points = []
+
+                for i in range(1, 7):
+                    points += [g[0][2] for g in games if g[0][2] == i]
+                allGames.append(
+                    [True, w, round(sum(points)/len(points), 3)])
+                doneFile.write(
+                    w + "," + str(round(sum(points)/len(points), 3)) + "\n")
+
             allGames = [g for g in allGames if g[0] == True]
             allGames = [[g[1], g[2]] for g in allGames]
             allGames += doneScores

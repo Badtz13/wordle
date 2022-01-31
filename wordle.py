@@ -72,12 +72,17 @@ def genPossible(data, validWords, validAnswers):
     sortedFreq = [c for c in sorted(
         freq, key=lambda x: x[1], reverse=True) if c[0] not in green]
 
+    full = []
+
     if len(sortedFreq) != 0:
 
-        full = [w[0] for w in sorted([[word, score(word, sortedFreq)]
-                                     for word in validWords], key=lambda x: x[1], reverse=True)]
-    else:
-        full = []
+        bucket = 0
+        for word in validWords:
+            s = score(word, sortedFreq)
+            if s > bucket:
+                bucket = s
+                full = word
+        full = [full]
 
     some = sorted(words, key=lambda x: score(x[1], sortedFreq), reverse=True)
 
