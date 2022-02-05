@@ -139,22 +139,25 @@ elif len(sys.argv) > 1:
 
         # check for list size?
         if len(sys.argv) == 4:
+
+            print("Checking all possible starting words: ")
+
+            doneScores = [w.rstrip().split(",")
+                          for w in open('doneGames.txt').readlines()]
+            doneWords = [w[0] for w in doneScores]
+            doneFile = open("doneGames.txt", "a")
+
+            if len(doneWords) > 0:
+                print(str(len(doneWords)) +
+                      " completed words found, proceeding ... ")
+
+            validWords = [c for c in validWords if c not in doneWords]
+
             segment = int(sys.argv[3])
             segSize = len(validWords) // int(sys.argv[2])
 
             validWords = [validWords[i]
                           for i in range(segment*segSize, segSize*(segment+1))]
-
-            print("Checking all possible starting words: ")
-            doneScores = [w.rstrip().split(",")
-                          for w in open('doneGames.txt').readlines()]
-            doneWords = [w[0] for w in doneScores]
-            doneFile = open("doneGames.txt", "a")
-            if len(doneWords) > 0:
-                print(str(len(doneWords)) +
-                      " completed words found, removing from segment and resuming... ")
-
-            validWords = [c for c in validWords if c not in doneWords]
 
             print(str(len(validWords)) +
                   " words left to try in the specified segment ")
