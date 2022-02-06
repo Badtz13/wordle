@@ -89,9 +89,11 @@ def genPossible(data, validWords, validAnswers):
     return full, some
 
 
-def showScore(grid, number, guesses):
+def showScore(grid, number, guesses, automated=False):
     print()
-    print("Wordle " + str(number) + " " + str(guesses) + "/6")
+    print("Wordle " + str(number) + " " + str(guesses) + "/6", end="")
+    if automated:
+        print(" (🤖)")
     print()
     for row in grid:
         rowString = []

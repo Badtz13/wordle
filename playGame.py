@@ -100,7 +100,7 @@ elif len(sys.argv) > 1:
         result = playGame(word, validAnswers, validWords)
         print("Wins in " + str(result[2]) + " guesses: ")
         print(result[3])
-        wordle.showScore(result[4], number, result[2])
+        wordle.showScore(result[4], number, result[2], True)
     elif command == "all":
         startWord = wordle.bestFirstWord()
         if len(sys.argv) == 3:
