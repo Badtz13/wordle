@@ -154,10 +154,11 @@ elif len(sys.argv) > 1:
             validWords = [c for c in validWords if c not in doneWords]
 
             segment = int(sys.argv[3])
-            segSize = len(validWords) // int(sys.argv[2])
 
-            validWords = [validWords[i]
-                          for i in range(segment*segSize, segSize*(segment+1))]
+            if int(sys.argv[2]) != 0:
+                segSize = len(validWords) // int(sys.argv[2])
+                validWords = [validWords[i]
+                              for i in range(segment*segSize, segSize*(segment+1))]
 
             print(str(len(validWords)) +
                   " words left to try in the specified segment ")
