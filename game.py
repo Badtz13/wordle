@@ -4,8 +4,6 @@ from cmd import Cmd
 
 import wordle
 
-validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
-
 index = None
 
 if len(sys.argv) > 1:
@@ -58,7 +56,7 @@ class prompt(Cmd):
         return True
 
     def default(self, inp):
-        if len(inp) != 5 or inp not in validWords:
+        if len(inp) != 5 or inp not in wordle.validWords():
             os.system('clear')
             showGrid()
             print("Input must be a valid 5 letter word")

@@ -1,11 +1,21 @@
+import os
 from datetime import date
 
-words = [word.rstrip() for word in open('validAnswers.txt').readlines()]
+cwd = "/".join(os.path.realpath(__file__).split("/")[:-1])
+
+
+def validAnswers():
+    return [word.rstrip()
+            for word in open(cwd + '/validAnswers.txt').readlines()]
+
+
+def validWords():
+    return [word.rstrip() for word in open(cwd + '/validWords.txt').readlines()]
 
 
 def solution(day=None):
     days = day if day else (date.today() - date(2021, 6, 19)).days
-    return words[days], days
+    return validAnswers()[days], days
 
 
 def check(answer, guessStr):
@@ -89,29 +99,35 @@ def genPossible(data, validWords, validAnswers):
     return full, some
 
 
-def showScore(grid, number, guesses, automated=False):
-    print()
-    print("Wordle " + str(number) + " " + str(guesses) + "/6", end="")
-    if automated:
-        print(" (🤖)")
-    print()
-    for row in grid:
-        rowString = []
-        for c in row[1]:
-            if c == 'g':
-                rowString.append('🟩')
-            elif c == 'y':
-                rowString.append('🟨')
-            elif c == 'b':
-                rowString.append('⬛')
-        if len(rowString) > 0:
-            print("".join(rowString))
-    print()
+def showScore(grid, number, guesses, automated=False, onlyGuesses=False):
+    if onlyGuesses:
+        print(guesses, end="")
+    else:
+        print("Wins in " + str(guesses) + " guesses")
+        glist = ["".join(r[0]) for r in grid]
+        print([g for g in glist if g != ' '])
+        print()
+        print("Wordle " + str(number) + " " + str(guesses) + "/6", end="")
+        if automated:
+            print(" (🤖)")
+        print()
+        for row in grid:
+            rowString = []
+            for c in row[1]:
+                if c == 'g':
+                    rowString.append('🟩')
+                elif c == 'y':
+                    rowString.append('🟨')
+                elif c == 'b':
+                    rowString.append('⬛')
+            if len(rowString) > 0:
+                print("".join(rowString))
+        print()
 
 
 def bestFirstWord():
     doneScores = [w.rstrip().split(",")
-                  for w in open('doneGames.txt').readlines()]
+                  for w in open(cwd + '/doneGames.txt').readlines()]
     doneScores = [d for d in doneScores if d[1] != "10"]
     doneScores = [g for g in sorted(
         doneScores, key=lambda x: x[1], reverse=False)]

@@ -2,9 +2,6 @@ import sys
 
 import wordle
 
-validAnswers = [word.rstrip() for word in open('validAnswers.txt').readlines()]
-validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
-
 data = []
 
 args = sys.argv[1:]
@@ -15,6 +12,7 @@ else:
     for i in range(0, len(args), 2):
         data.append([args[i], args[i+1]])
 
-full, some = wordle.genPossible(data, validAnswers, validWords)
+full, some = wordle.genPossible(
+    data, wordle.validAnswers(), wordle.validWords())
 print(full[:10])
 print(some[:10])

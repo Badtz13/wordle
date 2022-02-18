@@ -6,9 +6,6 @@ from tqdm import tqdm
 import wordle
 
 # read in lists
-validAnswers = [word.rstrip()
-                for word in open('validAnswers.txt').readlines()]
-validWords = [word.rstrip() for word in open('validWords.txt').readlines()]
 
 
 def guess(word, answer, grid, guesses, guessList):
@@ -78,6 +75,9 @@ def showUsage():
     print("newGame.py findBest <divisor> <segment>")
 
 
+validWords = wordle.validWords()
+validAnswers = wordle.validAnswers()
+
 # no args, show help
 if len(sys.argv) == 1:
     showUsage()
@@ -88,19 +88,22 @@ elif len(sys.argv) > 1:
 
     # play single game
     if command == "single":
+        scoreOnly = False
 
         # check if game number is specified
         if len(sys.argv) > 2:
-            word, number = wordle.solution(int(sys.argv[2]))
-
-        # assume today
+            if sys.argv[2] == "today":
+                word, number = wordle.solution()
+            else:
+                word, number = wordle.solution(int(sys.argv[2]))
         else:
             word, number = wordle.solution()
 
+        if len(sys.argv) > 3:
+            scoreOnly = True
+
         result = playGame(word, validAnswers, validWords)
-        print("Wins in " + str(result[2]) + " guesses: ")
-        print(result[3])
-        wordle.showScore(result[4], number, result[2], True)
+        wordle.showScore(result[4], number, result[2], True, scoreOnly)
     elif command == "all":
         startWord = wordle.bestFirstWord()
         if len(sys.argv) == 3:
